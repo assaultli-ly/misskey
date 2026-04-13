@@ -1,0 +1,14 @@
+[
+	{
+		"id": "char-001",
+		"name": "キャラA",
+		"birthday": "04-15",
+		"url": "https://example.com/charA"
+	},
+	{
+		"id": "char-002",
+		"name": "キャラB",
+		"birthday": "04-18",
+		"url": "https://example.com/charB"
+	}
+]
