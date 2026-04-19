@@ -5,18 +5,57 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div :class="$style.root">
-	<MkA :to="userPage(item.user)" style="overflow: clip;">
-		<MkUserCardMini :user="item.user" :withChart="false" style="text-overflow: ellipsis; background: inherit; border-radius: unset;">
-			<template #sub>
-				<span>{{ countdownDate }}</span>
-				<span> / </span>
-				<span class="_monospace">@{{ acct(item.user) }}</span>
-			</template>
-		</MkUserCardMini>
-	</MkA>
-	<button v-tooltip.noDelay="i18n.ts.note" class="_button" :class="$style.post" @click="os.post({initialText: `@${item.user.username}${item.user.host ? `@${item.user.host}` : ''} `})">
-		<i class="ti-fw ti ti-confetti" :class="$style.postIcon"></i>
-	</button>
+	<!-- user -->
+	<template v-if="isUserItem">
+		<MkA :to="userPage(item.user)" style="overflow: clip;">
+			<MkUserCardMini :user="item.user" :withChart="false" style="text-overflow: ellipsis; background: inherit; border-radius: unset;">
+				<template #sub>
+					<span>{{ countdownDate }}</span>
+					<span> / </span>
+					<span class="_monospace">@{{ acct(item.user) }}</span>
+				</template>
+			</MkUserCardMini>
+		</MkA>
+
+		<button
+			v-tooltip.noDelay="i18n.ts.note"
+			class="_button"
+			:class="$style.post"
+			@click="os.post({ initialText: `@${item.user.username}${item.user.host ? `@${item.user.host}` : ''} ` })"
+		>
+			<i class="ti-fw ti ti-confetti" :class="$style.postIcon"></i>
+		</button>
+	</template>
+
+	<!-- character -->
+	<template v-else>
+		<a
+			:href="(item as any).character.url"
+			target="_blank"
+			rel="noopener"
+			:class="$style.characterLink"
+			style="overflow: clip;"
+		>
+			<div :class="$style.characterRow">
+				<div :class="$style.characterMain">
+					<span :class="$style.characterName">{{ (item as any).character.name }}</span>
+				</div>
+				<div :class="$style.characterSub">
+					<span>{{ countdownDate }}</span>
+				</div>
+			</div>
+		</a>
+
+		<!-- keep grid layout (2nd column) -->
+		<button
+			v-tooltip.noDelay="i18n.ts.note"
+			class="_button"
+			:class="$style.post"
+			@click.stop="os.post({ initialText: `🎉 ${(item as any).character.name} 誕生日おめでとう！ #アサルトリリィ ` })"
+		>
+			<i class="ti-fw ti ti-confetti" :class="$style.postIcon"></i>
+		</button>
+	</template>
 </div>
 </template>
 
@@ -30,8 +69,10 @@ import { useLowresTime } from '@/composables/use-lowres-time.js';
 import { userPage, acct } from '@/filters/user.js';
 
 const props = defineProps<{
-	item: Misskey.entities.UsersGetFollowingUsersByBirthdayResponse[number];
+	item: Misskey.entities.UsersGetFollowingUsersByBirthdayResponse[number] & { type?: 'user' | 'character' };
 }>();
+
+const isUserItem = computed(() => (props.item as any).type !== 'character' && (props.item as any).user != null);
 
 const now = useLowresTime();
 const nowDate = computed(() => {
@@ -39,6 +80,7 @@ const nowDate = computed(() => {
 	date.setHours(0, 0, 0, 0);
 	return date;
 });
+
 const birthdayDate = computed(() => {
 	const [year, month, day] = props.item.birthday.split('-').map((v) => parseInt(v, 10));
 	return new Date(year, month - 1, day, 0, 0, 0, 0);
@@ -54,6 +96,9 @@ const countdownDate = computed(() => {
 		return i18n.tsx._ago.daysAgo({ n: Math.abs(days) });
 	}
 });
+
+// handy cast for user template
+const item = computed(() => props.item as any);
 </script>
 
 <style lang="scss" module>
@@ -82,5 +127,31 @@ const countdownDate = computed(() => {
 
 .postIcon {
 	color: var(--MI_THEME-fgOnAccent);
+}
+
+.characterLink {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+}
+
+.characterRow {
+	padding: 8px 12px 8px 16px;
+}
+
+.characterMain {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.characterName {
+	font-weight: 600;
+}
+
+.characterSub {
+	opacity: 0.75;
+	font-size: 85%;
+	margin-top: 2px;
 }
 </style>
