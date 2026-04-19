@@ -47,7 +47,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</a>
 
 		<!-- keep grid layout (2nd column) -->
-		<div></div>
+		<button
+			v-tooltip.noDelay="i18n.ts.note"
+			class="_button"
+			:class="$style.post"
+			@click.stop="os.post({ initialText: `🎉 ${(item as any).character.name} 誕生日おめでとう！ #アサルトリリィ ` })"
+		>
+			<i class="ti-fw ti ti-confetti" :class="$style.postIcon"></i>
+		</button>
 	</template>
 </div>
 </template>

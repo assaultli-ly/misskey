@@ -14,16 +14,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import type { Packed } from '@/misc/json-schema.js';
 
-import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
-import * as path from 'node:path';
-
-type CharacterBirthdaySourceItem = {
-	id: string;
-	name: string;
-	birthday: string; // "MM-DD"
-	url: string;
-};
+import { birthdayCharacters } from '@/misc/birthday-characters.js';
 
 type UserItem = {
 	type: 'user';
@@ -165,29 +156,6 @@ function nextUpcomingDateForMmdd(month: number, day: number, now = new Date()): 
 	return d;
 }
 
-async function loadCharacterBirthdays(): Promise<CharacterBirthdaySourceItem[]> {
-	// packages/backend/src/server/api/endpoints/users/get-following-users-by-birthday.ts
-	// -> packages/backend/assets/birthday-characters.json
-	const __filename = fileURLToPath(import.meta.url);
-	const __dirname = path.dirname(__filename);
-	const jsonPath = path.resolve(__dirname, '../../../../../assets/birthday-characters.json');
-
-	const raw = await readFile(jsonPath, 'utf-8');
-	const parsed = JSON.parse(raw);
-
-	if (!Array.isArray(parsed)) return [];
-
-	// Very light validation (keep it simple)
-	return parsed.filter((x): x is CharacterBirthdaySourceItem => {
-		return x != null
-			&& typeof x === 'object'
-			&& typeof (x as any).id === 'string'
-			&& typeof (x as any).name === 'string'
-			&& typeof (x as any).birthday === 'string'
-			&& typeof (x as any).url === 'string';
-	});
-}
-
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
@@ -269,36 +237,28 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				})
 				.filter((x): x is UserItem => x != null);
 
-			// ----- character birthdays (from file) -----
-			let characterItems: CharacterItem[] = [];
-			try {
-				const characters = await loadCharacterBirthdays();
-				const now = new Date();
+			// ----- character birthdays (from static list) -----
+			const now = new Date();
 
-				characterItems = characters.flatMap((c) => {
-					const md = parseMmddString(c.birthday);
-					if (!md) return [];
+			const characterItems: CharacterItem[] = birthdayCharacters.flatMap((c) => {
+				const md = parseMmddString(c.birthday);
+				if (!md) return [];
 
-					const mmdd = toMmdd(md.month, md.day);
-					if (!isInRangeMmdd(mmdd, beginMmdd, endMmdd)) return [];
+				const mmdd = toMmdd(md.month, md.day);
+				if (!isInRangeMmdd(mmdd, beginMmdd, endMmdd)) return [];
 
-					const next = nextUpcomingDateForMmdd(md.month, md.day, now);
+				const next = nextUpcomingDateForMmdd(md.month, md.day, now);
 
-					return [{
-						type: 'character',
-						id: c.id,
-						birthday: formatYmd(next),
-						character: {
-							name: c.name,
-							url: c.url,
-						},
-					} satisfies CharacterItem];
-				});
-			} catch {
-				// If file missing/invalid, just don't include characters (keep endpoint working)
-				characterItems = [];
-			}
-
+				return [{
+					type: 'character',
+					id: c.id,
+					birthday: formatYmd(next),
+					character: {
+						name: c.name,
+						url: c.url,
+					},
+				} satisfies CharacterItem];
+			});
 			// ----- merge, sort, slice -----
 			const merged: ResponseItem[] = [...userItems, ...characterItems];
 
