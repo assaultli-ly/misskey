@@ -212,4 +212,7 @@ export const birthdayCharacters: BirthdayCharacter[] = [
 	{ id: 'Chemir_Friedheim', name: 'チェミル・フリードハイム', birthday: '05-05', url: 'https://w.atwiki.jp/assault_lily/?page=%E3%83%81%E3%82%A7%E3%83%9F%E3%83%AB%E3%83%BB%E3%83%95%E3%83%AA%E3%83%BC%E3%83%89%E3%83%8F%E3%82%A4%E3%83%A0' },
 	{ id: 'Lemie_Alessandrini', name: 'レミエ・アレッサンドリーニ', birthday: '09-01', url: 'https://w.atwiki.jp/assault_lily/?page=%E3%83%AC%E3%83%9F%E3%82%A8%E3%83%BB%E3%82%A2%E3%83%AC%E3%83%83%E3%82%B5%E3%83%B3%E3%83%89%E3%83%AA%E3%83%BC%E3%83%8B' },
 	{ id: 'Altea_Alessandrini', name: 'アルテア・アレッサンドリーニ', birthday: '08-31', url: 'https://w.atwiki.jp/assault_lily/?page=%E3%82%A2%E3%83%AB%E3%83%86%E3%82%A2%E3%83%BB%E3%82%A2%E3%83%AC%E3%83%83%E3%82%B5%E3%83%B3%E3%83%89%E3%83%AA%E3%83%BC%E3%83%8B' },
+	{ id: 'Morishita_Miyabi', name: '森下雅枇', birthday: '01-02', url: 'https://w.atwiki.jp/assault_lily/?page=%E6%A3%AE%E4%B8%8B%E9%9B%85%E6%9E%87' },
+	{ id: 'Tsukioka_Chino', name: '月岡千乃', birthday: '03-20', url: 'https://w.atwiki.jp/assault_lily/?page=%E6%9C%88%E5%B2%A1%E5%8D%83%E4%B9%83' },
+	{ id: 'Yanagisawa_Ayako', name: '柳澤綾子', birthday: '05-05', url: 'https://w.atwiki.jp/assault_lily/?page=%E6%9F%B3%E6%BE%A4%E7%B6%BE%E5%AD%90' },
 ];
